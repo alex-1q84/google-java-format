@@ -86,8 +86,15 @@ public class ImportOrderer {
     @Override
     public int compareTo(Import that) {
       if (this.isStatic != that.isStatic) {
-        return this.isStatic ? -1 : +1;
+        return this.isStatic ? -2 : +1;
+      } else if (this.imported.startsWith("java") && !that.imported.startsWith("java")) {
+        //System.out.println("imported: " + this.imported);
+        return -1;
+      } else if (!this.imported.startsWith("java") && that.imported.startsWith("java")) {
+        //System.out.println("imported: " + this.imported);
+        return +1;
       }
+
       return this.imported.compareTo(that.imported);
     }
 
@@ -129,6 +136,7 @@ public class ImportOrderer {
 
     StringBuilder result = new StringBuilder();
     String prefix = tokString(0, unindentedFirstImportStart);
+    System.out.println("prefix: " + prefix);
     result.append(prefix);
     if (!prefix.isEmpty() && Newlines.getLineEnding(prefix) == null) {
       result.append(lineSeparator).append(lineSeparator);
@@ -250,6 +258,7 @@ public class ImportOrderer {
     // Pretend that the first import was preceded by another import of the same kind
     // (static or non-static), so we don't insert a newline there.
     boolean lastWasStatic = firstImport.isStatic;
+    boolean prevJavaImport = false;
 
     StringBuilder sb = new StringBuilder();
     for (Import thisImport : imports) {
@@ -257,6 +266,13 @@ public class ImportOrderer {
         // Blank line between static and non-static imports.
         sb.append(lineSeparator);
       }
+
+      // separate java sdk imports
+      if (prevJavaImport && !thisImport.imported.startsWith("java")) {
+        sb.append(lineSeparator);
+      }
+      prevJavaImport = thisImport.imported.startsWith("java");
+
       lastWasStatic = thisImport.isStatic;
       sb.append(thisImport);
     }
