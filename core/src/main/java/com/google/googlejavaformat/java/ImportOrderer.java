@@ -136,7 +136,7 @@ public class ImportOrderer {
 
     StringBuilder result = new StringBuilder();
     String prefix = tokString(0, unindentedFirstImportStart);
-    System.out.println("prefix: " + prefix);
+    //System.out.println("prefix: " + prefix);
     result.append(prefix);
     if (!prefix.isEmpty() && Newlines.getLineEnding(prefix) == null) {
       result.append(lineSeparator).append(lineSeparator);
